@@ -1,22 +1,28 @@
-import shutil, os, pptx
+import shutil, os, pptx,platform
 import pandas as pd
+
+from pathlib import Path
+
 from pptx.enum.text import PP_ALIGN
 from pptx.util import Inches, Pt
 from pptx.dml.color import RGBColor
 
 
+def create_and_get_ppt_path(retail_name: str, type_name: str, amount_formatted: str, OC_specific_number: str) -> Path:
+    ppt_filename = f"{type_name.upper()} {type_name.upper()} (${amount_formatted.replace(',','.')}) - {OC_specific_number}.pptx"
+    
+    folder_path = Path.home() / "Desktop" / "PPTs" / f"{retail_name}" / f"{type_name}"
+    folder_path.mkdir(parents=True, exist_ok=True)
+
+    return folder_path
+
 def read_and_get() -> None:
     my_data = pd.read_excel("Planilla de Pagos MX.xlsx",sheet_name="Detalle OCs",skiprows=1)
-    
-    if not os.path.exists("ppts"):
-        for x in my_data["Retail"].unique():
-            for y in my_data["Descripción"].unique():
-                os.makedirs(f"ppts\\{x}\\{y}")
 
     for i in range(len(my_data["Descripción"])):
         create_ppt(my_data["Descripción"][i],my_data["Retail"][i],int(my_data["Comprometido Retail"][i]),my_data["OC"][i])
 
-def create_ppt(type_name: str, retail_name_specific: str, amount: int ,OC_number_specific: str)-> None:
+def create_ppt(type_name: str, retail_name: str, amount: int , OC_specific_number: str)-> None:
     amount_formatted = f"{amount:,}"
 
     # Creating the presentation
@@ -35,32 +41,37 @@ def create_ppt(type_name: str, retail_name_specific: str, amount: int ,OC_number
     retail_box = slide.shapes.add_textbox(left, top, width, height)
 
     # Textframe inside the box
-    tf_retail_name = retail_box.text_frame
+    tf_retail = retail_box.text_frame
 
     # Adding the paragraph
-    retail_name = tf_retail_name.paragraphs[0]
-    retail_name.text = retail_name_specific.upper()
-    retail_name.font.bold = True
-    retail_name.alignment = PP_ALIGN.CENTER
+    retail = tf_retail.paragraphs[0]
+    retail.text = retail_name.upper()
+    retail.font.bold = True
+    retail.alignment = PP_ALIGN.CENTER
 
-    run = retail_name.runs[0]
+    run = retail.runs[0]
     run.font.size = Pt(72)
     run.font.color.rgb = RGBColor(128,0,64)
 
 
     # Add the OC number
-    oc_number = tf_retail_name.add_paragraph()
-    oc_number.text = OC_number_specific
+    oc_number = tf_retail.add_paragraph()
+    oc_number.text = OC_specific_number
     oc_number.alignment = PP_ALIGN.CENTER
     oc_number.font.size = Pt(48)
 
     # Add the Period
-    period = tf_retail_name.add_paragraph()
+    period = tf_retail.add_paragraph()
     period.text = "Oct 1st to Dec 31st 2024"
     period.alignment = PP_ALIGN.CENTER
     period.font.size = Pt(28)
 
-    prs.save(f"ppts\\{retail_name_specific}\\{type_name}\\{type_name.upper()} {retail_name_specific.upper()} (${amount_formatted.replace(',','.')}) - {OC_number_specific}.pptx")
+    prs.save(create_and_get_ppt_path(retail_name,type_name,amount_formatted,OC_specific_number) / f"{type_name.upper()} {type_name.upper()} (${amount_formatted.replace(',','.')}) - {OC_specific_number}.pptx")
     return
 
-read_and_get()
+
+def main():
+    read_and_get()
+
+if __name__ == "__main__":
+    main()
