@@ -9,8 +9,6 @@ from pptx.dml.color import RGBColor
 
 
 def create_and_get_ppt_path(retail_name: str, type_name: str, amount_formatted: str, OC_specific_number: str) -> Path:
-    ppt_filename = f"{type_name.upper()} {retail_name.upper()} (${amount_formatted.replace(',','.')}) - {OC_specific_number}.pptx"
-    
     folder_path = Path.home() / "Desktop" / "PPTs" / f"{retail_name}" / f"{type_name}"
     folder_path.mkdir(parents=True, exist_ok=True)
 
@@ -66,7 +64,7 @@ def create_ppt(type_name: str, retail_name: str, amount: int , OC_specific_numbe
     period.alignment = PP_ALIGN.CENTER
     period.font.size = Pt(28)
 
-    prs.save(create_and_get_ppt_path(retail_name,type_name,amount_formatted,OC_specific_number) / f"{type_name.upper()} {type_name.upper()} (${amount_formatted.replace(',','.')}) - {OC_specific_number}.pptx")
+    prs.save(create_and_get_ppt_path(retail_name,type_name,amount_formatted,OC_specific_number) / f"{type_name.upper()} {retail_name.upper()} (${amount_formatted.replace(',','.')}) - {OC_specific_number}.pptx")
     return
 
 
