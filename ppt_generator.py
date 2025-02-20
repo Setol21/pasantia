@@ -64,7 +64,8 @@ def create_ppt(type_name: str, retail_name: str, amount: int , OC_specific_numbe
     period.alignment = PP_ALIGN.CENTER
     period.font.size = Pt(28)
 
-    prs.save(create_and_get_ppt_path(retail_name,type_name) / f"{type_name.upper()} {retail_name.upper()} (${amount_formatted.replace(',','.')}) - {OC_specific_number}.pptx")
+    path_to_save = create_and_get_ppt_path(retail_name,type_name) / f"{type_name.upper()} {retail_name.upper()} (${amount_formatted.replace(',','.')}) - {OC_specific_number}.pptx"
+    prs.save(path_to_save)
     return
 
 
